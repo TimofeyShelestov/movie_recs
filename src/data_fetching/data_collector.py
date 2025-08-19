@@ -8,9 +8,14 @@ async def collect_movies(pages):
   for page in res:
     raw_data.extend(page["results"])
 
-  with open("data/raw_movies.json", "w") as f:
-          json.dump(raw_data, f, indent=2)
+  save_data(raw_data, "raw_data")
 
+  movies = remove_unnecessary_attributes(raw_data)
+  cleaned_movies = remove_duplicates(movies)
+  save_data(cleaned_movies, "movies")
+
+
+def remove_unnecessary_attributes(raw_data):
   movies = [
     {
         "id": movie["id"],
@@ -21,6 +26,14 @@ async def collect_movies(pages):
     }
     for movie in raw_data
   ]
+  
+  return movies
 
-  with open("data/movies.json", "w") as f:
-          json.dump(movies, f, indent=2)
+
+def remove_duplicates(data):
+  return list(set(data))
+
+
+def save_data(data, filename):
+  with open(f"data/{filename}.json", "w") as f:
+    json.dump(data, f, indent=2)
