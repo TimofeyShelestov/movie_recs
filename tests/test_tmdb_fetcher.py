@@ -71,3 +71,18 @@ class TestSiglePageFetch():
     mocked.assert_called_once()
     assert res is None
 
+
+class TestAyncPagesFetch:
+  @pytest.mark.asyncio
+  async def test_multiple_page_response(self):
+
+    with aioresponses() as mocked:
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=2&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=3&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=4&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=5&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+
+      res = await tmdb_fetcher.fetch_pages_async(5)
+    assert res is not None  
+       
