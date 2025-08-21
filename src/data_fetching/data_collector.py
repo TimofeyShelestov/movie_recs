@@ -1,3 +1,5 @@
+import asyncio
+
 import json
 from .tmdb_fetcher import fetch_pages_async
 
@@ -43,3 +45,6 @@ def remove_duplicates(data):
 def save_data(data, filename):
   with open(f"data/{filename}.json", "w") as f:
     json.dump(data, f, indent=2)
+    
+
+asyncio.run(collect_movies(40))
