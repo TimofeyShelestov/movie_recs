@@ -1,6 +1,5 @@
 import sys
 import json
-sys.path.insert(0, '../src')
 from src.data_fetching import data_collector
 
 
