@@ -26,63 +26,61 @@ json_response = {
     "total_results": 10000
 } 
 
-class TestSiglePageFetch(): 
-  @pytest.mark.asyncio
-  async def test_successful_response(self):
-    session = aiohttp.ClientSession()
+@pytest.mark.asyncio
+async def test_successful_response():
+  session = aiohttp.ClientSession()
 
-    with aioresponses() as mocked:
-        mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', status=SUCCESS_STATUS, payload=json_response, headers=valid_content_type_header)
-        res = await tmdb_fetcher.fetch_single_page(session, 1)
+  with aioresponses() as mocked:
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', status=SUCCESS_STATUS, payload=json_response, headers=valid_content_type_header)
+      res = await tmdb_fetcher.fetch_single_page(session, 1)
 
-        await session.close()
+      await session.close()
 
-        mocked.assert_called_once()
-        assert res is not None
-        assert res["page"] == 1
-        assert len(res["results"]) == 2
-        assert res["results"][0]["title"] == "Test Movie"
-
-
-  @pytest.mark.asyncio
-  async def test_error_code_response(self):
-    session = aiohttp.ClientSession()
-
-    with aioresponses() as mocked:
-        mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', status=BAD_STATUS, payload=json_response, headers=valid_content_type_header)
-        res = await tmdb_fetcher.fetch_single_page(session, 1)
-
-        await session.close()
-
-    mocked.assert_called_once()
-    assert res is None
+      mocked.assert_called_once()
+      assert res is not None
+      assert res["page"] == 1
+      assert len(res["results"]) == 2
+      assert res["results"][0]["title"] == "Test Movie"
 
 
-  @pytest.mark.asyncio
-  async def test_invalid_content_type_response(self):
-    session = aiohttp.ClientSession()
+@pytest.mark.asyncio
+async def test_error_code_response():
+  session = aiohttp.ClientSession()
 
-    with aioresponses() as mocked:
-        mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', payload=json_response, headers=invalid_content_type_header)
-        res = await tmdb_fetcher.fetch_single_page(session, 1)
+  with aioresponses() as mocked:
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', status=BAD_STATUS, payload=json_response, headers=valid_content_type_header)
+      res = await tmdb_fetcher.fetch_single_page(session, 1)
 
-        await session.close()
+      await session.close()
 
-    mocked.assert_called_once()
-    assert res is None
+  mocked.assert_called_once()
+  assert res is None
 
 
-class TestAyncPagesFetch:
-  @pytest.mark.asyncio
-  async def test_multiple_page_response(self):
+@pytest.mark.asyncio
+async def test_invalid_content_type_response():
+  session = aiohttp.ClientSession()
 
-    with aioresponses() as mocked:
-      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
-      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=2&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
-      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=3&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
-      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=4&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
-      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=5&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+  with aioresponses() as mocked:
+      mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', payload=json_response, headers=invalid_content_type_header)
+      res = await tmdb_fetcher.fetch_single_page(session, 1)
 
-      res = await tmdb_fetcher.fetch_pages_async(5)
-    assert res is not None  
-       
+      await session.close()
+
+  mocked.assert_called_once()
+  assert res is None
+
+
+@pytest.mark.asyncio
+async def test_multiple_page_response():
+
+  with aioresponses() as mocked:
+    mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=1&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+    mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=2&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+    mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=3&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+    mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=4&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+    mocked.get(f'{settings.TMDB_BASE_URL}/movie/popular?page=5&language=en-US', payload=json_response, headers=valid_content_type_header, repeat=True)
+
+    res = await tmdb_fetcher.fetch_pages_async(5)
+  assert res is not None  
+     

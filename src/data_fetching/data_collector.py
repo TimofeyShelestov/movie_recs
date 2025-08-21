@@ -31,7 +31,13 @@ def remove_unnecessary_attributes(raw_data):
 
 
 def remove_duplicates(data):
-  return list(set(data))
+  unique_list = []
+
+  for item in data:
+    if item not in unique_list:
+      unique_list.append(item)
+
+  return unique_list    
 
 
 def save_data(data, filename):
